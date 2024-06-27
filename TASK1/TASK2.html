@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css">
+   
+    
+
+</head>
+<body>
+    
+    <style>
+        
+        .pointer::before {
+            content: "";
+            position: absolute;
+            top: -20px; 
+            left: 50%;
+            transform: translateX(-50%) rotate(180deg);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent; 
+            border-right: 20px solid transparent;
+            border-bottom: 20px solid black;
+        }
+    </style>
+
+
+
+    <div class="bg-gray-100 flex justify-evenly flex-row items-center h-screen"> 
+        
+        <!-- whl and btn -->
+        
+        <div class="text-center">
+            <div class="text-center mb-4 relative">
+                <div class="relative w-80 h-80 mx-auto">
+                    <!-- Pointer -->
+                    <div id="Pointer" class="pointer w-3 h-8 bg-transparent absolute -top-4 left-1/2"></div>
+                    <div id="wheel" class="w-full h-full rounded-full border-5 border-black overflow-hidden transition-transform duration-6500 ease-out"></div>
+                </div>
+                <button onclick="spinnerFunction()" class="w-full px-4 py-2 mt-4 bg-green-500 text-white rounded hover:bg-green-600">
+                    Spin It
+                </button>
+            </div>
+        </div>
+        
+        <!-- whl and btn -->
+
+        <div class="w-100">
+            <h1 class="text-lg text-center">
+                Add names
+            </h1>
+            <textarea onchange="updateNames()"  id="All_names" placeholder="enter names" rows="5" class="w-full border rounded mb-2"></textarea>
+        </div>
+    </div>
+
+
+
+
+    <script> // wheel code here
+
+        let spinning = false;
+        const initial_names = ['Jashim', 'Jisan', 'Ibrahim', 'Rifat', 'Teebro'];
+        let global_names = [...initial_names];
+        
+        window.onload = function()
+        {
+            const names = document.getElementById('All_names');
+            names.value = initial_names.join('\n');
+            console.log(names.value);
+            updateNames()
+        }
+
+        function updateNames()
+        {
+            const names = document.getElementById('All_names');
+            global_names = names.value.split('\n');
+            names.value = global_names.join('\n');
+            console.log(global_names); 
+
+            const wheel_div = document.getElementById('wheel');
+            wheel_div.innerHTML = '';
+            
+            global_names.forEach((name, idx) => {
+                wheel_div.appendChild(wheelSection(name, idx, global_names.length));
+            });
+            wheel_div.style.transform = 'rotate(0deg)';
+        } 
+
+
+        function wheelSection(name, idx, totalSections) 
+        {
+            const Section = document.createElement('div');
+            Section.className = 'absolute w-full h-full origin-center';
+            Section.style.background = randomHexColor();
+            Section.style.transform = `rotate(${360 / totalSections * idx}deg)`;
+            Section.style.transformOrigin = 'center center';
+            Section.style.clipPath = circlePathsDesign(totalSections);
+            Section.style.transition = 'transform 5s cubic-bezier(0.25, 0.1, 0.25, 1)';
+        
+            const nameofsection = document.createElement('span');
+            nameofsection.className = 'absolute text-center text-white text-sm';
+            nameofsection.style.left = '60%';
+            nameofsection.style.top = '25%';
+            nameofsection.style.transform = `rotate(${90 + 360 / totalSections / 2}deg)`;
+            nameofsection.textContent = name;
+            
+            Section.appendChild(nameofsection);
+            return Section;
+        }
+        function circlePathsDesign(totalSections) {
+            const circlePaths = {
+                2: 'polygon(50% 0%, 100% 0%, 100% 100%, 50% 100%, 50% 50%)',
+                3: 'polygon(50% 0%, 100% 0%, 100% 100%, 50% 50%)',
+                4: 'polygon(50% 0%, 100% 0%, 100% 50%, 50% 50%)',
+                5: 'polygon(50% 0%, 100% 0%, 100% 40%, 50% 50%)',
+                6: 'polygon(50% 0%, 100% 0%, 100% 33.33%, 50% 50%)',
+                7: 'polygon(50% 0%, 100% 0%, 100% 28.57%, 50% 50%)'
+            };
+        
+            return circlePaths[totalSections] || 'polygon(50% 50%, 50% 0, 0 0)';
+        }
+        
+        function randomHexColor() {
+            return '#' + Math.floor(Math.random()*16777215).toString(16);
+        }
+
+
+
+        function spinnerFunction() {
+            if (spinning)
+            {
+                return;
+            }
+            spinning = true;
+            const wheel = document.getElementById('wheel');
+            const spinDuration = 5000;
+            const spins = Math.floor(Math.random() * 6) + 5;
+            const totalRotation = 360 * spins + Math.random() * 360;
+        
+            wheel.style.transition = `transform ${spinDuration}ms cubic-bezier(0.25, 0.1, 0.25, 1)`;
+            wheel.style.transform = `rotate(${totalRotation}deg)`;
+        
+            setTimeout(() => {
+                spinning = false;
+                
+                const finalAngle = totalRotation % 360;
+               
+                const anglePerSegment = 360 / global_names.length;
+                
+                const winnerIndex = Math.floor(finalAngle / anglePerSegment) % global_names.length;
+                const winner = global_names[winnerIndex];
+                alert(`Showing a random Winner. The pointer doesn't works for now.The winner is ${winner}`);
+            }, spinDuration);
+        }
+
+    </script>
+
+
+
+</body>
+</html>
